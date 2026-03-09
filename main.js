@@ -1066,12 +1066,18 @@ Nunca más, nunca más, ni a llevar a adelga te vas a animar`,
 
       /* Play desde el inicio */
       track.audio.currentTime = 0;
-      track.audio.play();
+      const playPromise = track.audio.play();
       playerPlayPause.firstChild && playerPlayPause.removeChild(playerPlayPause.firstChild);
       playerPlayPause.appendChild(createIcon(pauseIcon));
 
-      /* Media Session para reproducción en segundo plano */
-      updateMediaSession(track);
+      /* Media Session DESPUÉS de play (requerido por iOS Safari) */
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          updateMediaSession(track);
+        }).catch(() => {});
+      } else {
+        updateMediaSession(track);
+      }
 
       /* Actualizar botón del listado */
       updateListButtons();
@@ -1116,6 +1122,10 @@ Nunca más, nunca más, ni a llevar a adelga te vas a animar`,
       row.appendChild(buttons);
 
       track.audio = new Audio(track.file);
+      track.audio.setAttribute('playsinline', '');
+      track.audio.preload = 'metadata';
+      document.body.appendChild(track.audio);
+      track.audio.style.display = 'none';
 
       /* Eventos del audio para el slider */
       track.audio.addEventListener("timeupdate", () => {
@@ -1215,20 +1225,12 @@ coverModal.addEventListener('click', () => {
 });
 
 /* 3. Media Session API – controles del sistema para reproducción en segundo plano */
-function updateMediaSession(track) {
-  if (!('mediaSession' in navigator)) return;
-  const artworkSrc = new URL(track.cover || 'imgs/tapa-disco.jpg', location.href).href;
-  navigator.mediaSession.metadata = new MediaMetadata({
-    title: track.title,
-    artist: 'El Anexo',
-    album: 'Sexo en el anexo',
-    artwork: [
-      { src: artworkSrc, sizes: '96x96', type: 'image/jpeg' },
-      { src: artworkSrc, sizes: '128x128', type: 'image/jpeg' },
-      { src: artworkSrc, sizes: '256x256', type: 'image/jpeg' },
-      { src: artworkSrc, sizes: '512x512', type: 'image/jpeg' }
-    ]
-  });
+let mediaSessionInitialized = false;
+
+function initMediaSessionHandlers() {
+  if (mediaSessionInitialized || !('mediaSession' in navigator)) return;
+  mediaSessionInitialized = true;
+
   navigator.mediaSession.setActionHandler('play', () => {
     if (currentAudio) {
       currentAudio.play();
@@ -1259,6 +1261,34 @@ function updateMediaSession(track) {
     const rows = trackList.querySelectorAll('.track');
     openTrack(tracks[next], rows[next]);
   });
+  try {
+    navigator.mediaSession.setActionHandler('seekto', (details) => {
+      if (currentAudio && details.seekTime != null) {
+        currentAudio.currentTime = details.seekTime;
+        playerSlider.value = details.seekTime;
+        playerCurrent.textContent = formatTime(details.seekTime);
+      }
+    });
+  } catch (e) { /* seekto no soportado */ }
+}
+
+function updateMediaSession(track) {
+  if (!('mediaSession' in navigator)) return;
+  initMediaSessionHandlers();
+
+  const artworkSrc = new URL(track.cover || 'imgs/tapa-disco.jpg', location.href).href;
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: track.title,
+    artist: 'El Anexo',
+    album: 'Sexo en el anexo',
+    artwork: [
+      { src: artworkSrc, sizes: '96x96', type: 'image/jpeg' },
+      { src: artworkSrc, sizes: '128x128', type: 'image/jpeg' },
+      { src: artworkSrc, sizes: '256x256', type: 'image/jpeg' },
+      { src: artworkSrc, sizes: '512x512', type: 'image/jpeg' }
+    ]
+  });
+  navigator.mediaSession.playbackState = 'playing';
 }
 
 /* Cerrar modal de tapa/contratapa con la tecla Esc */
