@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Disco Anexo">
-  <link rel="apple-touch-icon" href="imgs/logo-anexo.png">
+  <link rel="apple-touch-icon" href="imgs/tapa-disco.jpg">
   <link rel="stylesheet" href="estilo.css">
   <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -20,6 +20,23 @@
   <!-- Tapa del disco -->
   <div class="album-cover" id="coverThumb">
     <img src="imgs/tapa-disco.jpg" alt="Sexo en el anexo" />
+  </div>
+
+  <!-- Botón instalar app -->
+  <button class="install-btn" id="installBtn">Descargar App</button>
+
+  <!-- Modal instrucciones iOS -->
+  <div class="modal" id="iosModal">
+    <div class="modal-content ios-instructions">
+      <button class="close" id="closeIosModal">&times;</button>
+      <h2>Instalar en iPhone</h2>
+      <ol>
+        <li>Tocá el botón <strong>Compartir</strong> <span class="ios-icon">&#xe900;</span> en la barra de Safari (el cuadrado con la flecha hacia arriba)</li>
+        <li>Deslizá hacia abajo y elegí <strong>"Agregar a pantalla de inicio"</strong></li>
+        <li>Tocá <strong>"Agregar"</strong> arriba a la derecha</li>
+      </ol>
+      <p>La app va a aparecer en tu pantalla de inicio como cualquier otra app.</p>
+    </div>
   </div>
 
   <!-- Lista dinámica de temas -->

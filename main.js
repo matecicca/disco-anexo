@@ -1300,3 +1300,56 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(function() {});
 }
 
+/* ─── Botón instalar PWA ─── */
+(function() {
+  const installBtn = document.getElementById('installBtn');
+  const iosModal = document.getElementById('iosModal');
+  const closeIosModal = document.getElementById('closeIosModal');
+  let deferredPrompt = null;
+
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || navigator.standalone === true;
+
+  /* No mostrar si ya está instalada */
+  if (isStandalone) return;
+
+  /* Android: capturar evento beforeinstallprompt */
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'block';
+  });
+
+  /* iOS: mostrar botón siempre (no hay prompt nativo) */
+  if (isIos) {
+    installBtn.style.display = 'block';
+  }
+
+  installBtn.addEventListener('click', function() {
+    if (deferredPrompt) {
+      /* Android: lanzar prompt nativo de instalación */
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function() {
+        deferredPrompt = null;
+        installBtn.style.display = 'none';
+      });
+    } else if (isIos) {
+      /* iOS: mostrar instrucciones */
+      iosModal.classList.add('active');
+    }
+  });
+
+  /* Cerrar modal iOS */
+  iosModal.addEventListener('click', function(e) {
+    if (e.target === iosModal || e.target === closeIosModal) {
+      iosModal.classList.remove('active');
+    }
+  });
+
+  /* Ocultar botón si se instala */
+  window.addEventListener('appinstalled', function() {
+    installBtn.style.display = 'none';
+  });
+})();
+

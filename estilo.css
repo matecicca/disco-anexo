@@ -167,6 +167,46 @@
     box-shadow: 0 0 12px rgba(0,0,0,.4);
   }
 
+  /* Botón instalar */
+  .install-btn {
+    width: auto;
+    border-radius: 2rem;
+    padding: 0.7rem 2rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: white;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    display: none; /* se muestra vía JS */
+  }
+
+  .ios-instructions {
+    text-align: left;
+  }
+
+  .ios-instructions h2 {
+    text-align: center;
+    margin-bottom: 1.2rem;
+  }
+
+  .ios-instructions ol {
+    padding-left: 1.2rem;
+    line-height: 2;
+    font-size: 0.95rem;
+  }
+
+  .ios-instructions ol strong {
+    color: var(--accent);
+  }
+
+  .ios-instructions p {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    opacity: 0.7;
+    text-align: center;
+  }
+
   /* Footer */
   footer {
     width: 100%;
