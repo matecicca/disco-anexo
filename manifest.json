@@ -1,0 +1,21 @@
+{
+  "name": "Sexo en el Anexo",
+  "short_name": "Disco Anexo",
+  "description": "Álbum completo - El Anexo",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#013d18",
+  "theme_color": "#013d18",
+  "icons": [
+    {
+      "src": "imgs/logo-anexo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "imgs/logo-anexo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

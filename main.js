@@ -1064,20 +1064,15 @@ Nunca más, nunca más, ni a llevar a adelga te vas a animar`,
         playerDuration.textContent = "0:00";
       }
 
+      /* Media Session - setear metadata antes y después de play */
+      updateMediaSession(track);
+
       /* Play desde el inicio */
       track.audio.currentTime = 0;
-      const playPromise = track.audio.play();
-      playerPlayPause.firstChild && playerPlayPause.removeChild(playerPlayPause.firstChild);
-      playerPlayPause.appendChild(createIcon(pauseIcon));
-
-      /* Media Session DESPUÉS de play (requerido por iOS Safari) */
-      if (playPromise !== undefined) {
-        playPromise.then(() => {
-          updateMediaSession(track);
-        }).catch(() => {});
-      } else {
+      track.audio.play().then(() => {
+        /* Re-setear después de play para iOS */
         updateMediaSession(track);
-      }
+      }).catch(function(e) { console.warn('Play error:', e); });
 
       /* Actualizar botón del listado */
       updateListButtons();
@@ -1279,47 +1274,18 @@ function updateMediaSession(track) {
   if (!('mediaSession' in navigator)) return;
   initMediaSessionHandlers();
 
-  /* URL absoluta para el artwork */
-  const base = location.origin + location.pathname.replace(/[^/]*$/, '');
-  const artworkSrc = base + (track.cover || 'imgs/tapa-disco.jpg');
-
-  /* Pre-cargar la imagen antes de asignarla */
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.src = artworkSrc;
-  img.onload = function() {
-    /* Convertir a blob URL para máxima compatibilidad con iOS */
-    const canvas = document.createElement('canvas');
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    canvas.getContext('2d').drawImage(img, 0, 0);
-    canvas.toBlob(function(blob) {
-      const blobUrl = blob ? URL.createObjectURL(blob) : artworkSrc;
-      setMediaMetadata(track.title, blobUrl);
-    }, 'image/jpeg');
-  };
-  img.onerror = function() {
-    setMediaMetadata(track.title, artworkSrc);
-  };
-
-  /* Setear metadata inicial sin artwork para que aparezca rápido */
-  setMediaMetadata(track.title, artworkSrc);
-}
-
-function setMediaMetadata(title, artworkUrl) {
-  if (!('mediaSession' in navigator)) return;
-  navigator.mediaSession.metadata = new MediaMetadata({
-    title: title,
-    artist: 'El Anexo',
-    album: 'Sexo en el anexo',
-    artwork: [
-      { src: artworkUrl, sizes: '96x96', type: 'image/jpeg' },
-      { src: artworkUrl, sizes: '128x128', type: 'image/jpeg' },
-      { src: artworkUrl, sizes: '256x256', type: 'image/jpeg' },
-      { src: artworkUrl, sizes: '512x512', type: 'image/jpeg' }
-    ]
-  });
-  navigator.mediaSession.playbackState = 'playing';
+  try {
+    var artworkSrc = location.origin + '/imgs/tapa-disco.jpg';
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.title,
+      artist: 'El Anexo',
+      album: 'Sexo en el anexo',
+      artwork: [{ src: artworkSrc, sizes: '512x512', type: 'image/jpeg' }]
+    });
+    navigator.mediaSession.playbackState = 'playing';
+  } catch (e) {
+    console.warn('MediaSession error:', e);
+  }
 }
 
 /* Cerrar modal de tapa/contratapa con la tecla Esc */
@@ -1328,4 +1294,9 @@ document.addEventListener('keydown', (e) => {
     coverModal.classList.remove('active');
   }
 });
+
+/* Registrar Service Worker para PWA / iOS Now Playing */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(function() {});
+}
 
