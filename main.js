@@ -1217,11 +1217,17 @@ coverModal.addEventListener('click', () => {
 /* 3. Media Session API – controles del sistema para reproducción en segundo plano */
 function updateMediaSession(track) {
   if (!('mediaSession' in navigator)) return;
+  const artworkSrc = new URL(track.cover || 'imgs/tapa-disco.jpg', location.href).href;
   navigator.mediaSession.metadata = new MediaMetadata({
     title: track.title,
-    artist: 'Sexo en el anexo',
+    artist: 'El Anexo',
     album: 'Sexo en el anexo',
-    artwork: [{ src: track.cover || 'imgs/tapa-disco.jpg', sizes: '512x512', type: 'image/jpeg' }]
+    artwork: [
+      { src: artworkSrc, sizes: '96x96', type: 'image/jpeg' },
+      { src: artworkSrc, sizes: '128x128', type: 'image/jpeg' },
+      { src: artworkSrc, sizes: '256x256', type: 'image/jpeg' },
+      { src: artworkSrc, sizes: '512x512', type: 'image/jpeg' }
+    ]
   });
   navigator.mediaSession.setActionHandler('play', () => {
     if (currentAudio) {
