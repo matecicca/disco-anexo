@@ -1,0 +1,349 @@
+:root {
+    /* Ajusta estos colores para que coincidan con tu tapa */
+    --bg1: #013d18;
+    --bg2: #004b38;
+    --accent: #b18d2c;
+    --text: #f2f2f2;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .album-cover img {
+    width: 100%;
+    max-width: 320px;
+    border-radius: 1rem;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+    margin-bottom: 2rem;
+    cursor: pointer;
+  }
+
+  .track-list {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .track {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    backdrop-filter: blur(4px);
+  }
+
+  .track-title {
+    font-size: 1rem;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .track-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  button {
+    background: var(--accent);
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+
+  button svg {
+    fill: white;
+    width: 20px;
+    height: 20px;
+  }
+
+  /* MODALS */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    padding: 1rem;
+    z-index: 999;
+  }
+
+  .modal.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-content {
+    background: var(--bg2);
+    max-width: 600px;
+    width: 100%;
+    padding: 2rem;
+    border-radius: 1rem;
+    position: relative;
+    overflow-y: auto;
+    max-height: 90vh;
+  }
+
+  .modal-content h2 {
+    margin-bottom: 1rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .modal-content pre {
+    white-space: pre-wrap;
+    line-height: 1.5;
+    font-family: inherit;
+    font-size: 0.95rem;
+  }
+
+   /* Contenedor para varias imágenes en el modal */
+.cover-images {
+  display: flex;
+  flex-direction: column; /* vertical */
+  gap: 1rem;
+  align-items: center;
+}
+
+/* Ajusta el tamaño de cada imagen */
+.cover-images img {
+  max-width: 49vw;
+  max-height: 49vh;
+  width: auto;
+  border-radius: 0.75rem;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+}
+
+  .close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .full-cover {
+    max-width: 90vw;
+    max-height: 90vh;
+    width: 100%;
+    border-radius: 0.75rem;
+    box-shadow: 0 0 12px rgba(0,0,0,.4);
+  }
+
+  /* Footer */
+  footer {
+    width: 100%;
+    margin-top: 2rem;
+    padding: 1.2rem 1rem;
+    background: #012a10;
+    font-size: 0.75rem;
+    opacity: 0.85;
+    text-align: center;
+  }
+
+  /* ─── Banner reproductor flotante ─── */
+  .player-banner {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 520px;
+    display: none;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1.25rem;
+    background: rgba(1, 30, 15, 0.95);
+    backdrop-filter: blur(14px);
+    border-radius: 1rem;
+    box-shadow: 0 6px 32px rgba(0, 0, 0, 0.6);
+    z-index: 900;
+  }
+
+  .player-banner.active {
+    display: flex;
+  }
+
+  .player-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 0.5rem;
+    object-fit: cover;
+    background: rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+
+  .player-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .player-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .player-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .player-time {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    min-width: 2.5rem;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .player-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.15);
+    outline: none;
+    cursor: pointer;
+    min-width: 0;
+  }
+
+  .player-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  .player-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+  }
+
+  .player-controls {
+    display: flex;
+    gap: 0.4rem;
+    flex-shrink: 0;
+  }
+
+  .player-controls button {
+    width: 38px;
+    height: 38px;
+  }
+
+  /* ─── Track activo en el listado ─── */
+  .track.playing {
+    background: rgba(177, 141, 44, 0.15);
+    border: 1px solid rgba(177, 141, 44, 0.3);
+  }
+
+  @media (max-width: 480px) {
+    .track {
+      padding: 1rem;
+    }
+
+    .track-title {
+      font-size: 0.9rem;
+    }
+
+    button {
+      width: 36px;
+      height: 36px;
+    }
+
+    .cover-images img {
+      max-width: 100%;
+    }
+
+    /* Banner mobile: layout en 2 filas */
+    .player-banner {
+      bottom: 0;
+      right: 0;
+      left: 0;
+      width: 100%;
+      border-radius: 1rem 1rem 0 0;
+      flex-wrap: wrap;
+      padding: 0.75rem 1rem;
+      gap: 0.5rem;
+    }
+
+    .player-img {
+      width: 48px;
+      height: 48px;
+    }
+
+    /* Título + controles en la primera fila */
+    .player-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .player-title {
+      font-size: 0.85rem;
+    }
+
+    /* Slider ocupa toda la segunda fila */
+    .player-slider-row {
+      width: 100%;
+      order: 4;
+    }
+
+    .player-controls button {
+      width: 34px;
+      height: 34px;
+    }
+
+    /* Espacio para que el último track no quede tapado */
+    .track-list.has-player {
+      padding-bottom: 120px;
+    }
+  }
