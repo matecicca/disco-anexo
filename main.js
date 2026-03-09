@@ -1273,19 +1273,50 @@ function initMediaSessionHandlers() {
 }
 
 function updateMediaSession(track) {
+  /* iOS Safari muestra el <title> de la página en Now Playing */
+  document.title = track.title + ' — El Anexo';
+
   if (!('mediaSession' in navigator)) return;
   initMediaSessionHandlers();
 
-  const artworkSrc = new URL(track.cover || 'imgs/tapa-disco.jpg', location.href).href;
+  /* URL absoluta para el artwork */
+  const base = location.origin + location.pathname.replace(/[^/]*$/, '');
+  const artworkSrc = base + (track.cover || 'imgs/tapa-disco.jpg');
+
+  /* Pre-cargar la imagen antes de asignarla */
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.src = artworkSrc;
+  img.onload = function() {
+    /* Convertir a blob URL para máxima compatibilidad con iOS */
+    const canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    canvas.getContext('2d').drawImage(img, 0, 0);
+    canvas.toBlob(function(blob) {
+      const blobUrl = blob ? URL.createObjectURL(blob) : artworkSrc;
+      setMediaMetadata(track.title, blobUrl);
+    }, 'image/jpeg');
+  };
+  img.onerror = function() {
+    setMediaMetadata(track.title, artworkSrc);
+  };
+
+  /* Setear metadata inicial sin artwork para que aparezca rápido */
+  setMediaMetadata(track.title, artworkSrc);
+}
+
+function setMediaMetadata(title, artworkUrl) {
+  if (!('mediaSession' in navigator)) return;
   navigator.mediaSession.metadata = new MediaMetadata({
-    title: track.title,
+    title: title,
     artist: 'El Anexo',
     album: 'Sexo en el anexo',
     artwork: [
-      { src: artworkSrc, sizes: '96x96', type: 'image/jpeg' },
-      { src: artworkSrc, sizes: '128x128', type: 'image/jpeg' },
-      { src: artworkSrc, sizes: '256x256', type: 'image/jpeg' },
-      { src: artworkSrc, sizes: '512x512', type: 'image/jpeg' }
+      { src: artworkUrl, sizes: '96x96', type: 'image/jpeg' },
+      { src: artworkUrl, sizes: '128x128', type: 'image/jpeg' },
+      { src: artworkUrl, sizes: '256x256', type: 'image/jpeg' },
+      { src: artworkUrl, sizes: '512x512', type: 'image/jpeg' }
     ]
   });
   navigator.mediaSession.playbackState = 'playing';
